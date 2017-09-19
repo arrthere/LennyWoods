@@ -140,7 +140,7 @@ class LennyWoods:
         reply_markup = {"keyboard": layout, "resize_keyboard": False, "one_time_keyboard": True}
         reply_markup = json.dumps(reply_markup)
 
-        self.telegram.send_message(chat_id, 'Choose translation for the word: {}.'.format(word), reply_markup=reply_markup)
+        self.telegram.send_message(chat_id, u'Choose translation for the word: {}.'.format(word), reply_markup=reply_markup)
 
     def setup_database(self):
         self.database.start()
