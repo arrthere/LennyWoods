@@ -21,10 +21,8 @@ class Sqyler:
     def insert(self, table_name, values):
         data = []
         for value in values:
-            if type(value) is str:
-                data.append('\'' + value + '\'')
-            else:
-                data.append(value)
+            data.append('\'' + str(value) + '\'')
+
 
         data = ', '.join(data)
 
