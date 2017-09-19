@@ -42,11 +42,11 @@ class LennyWoods:
             try:
                 parsed = last_chat_text[5:].split(' * ')
             except:
-                self.telegram.send_message(last_chat_id, 'Not valid input 1')
+                self.telegram.send_message(last_chat_id, 'Not valid input.')
                 return
 
             if len(parsed) != 2:
-                self.telegram.send_message(last_chat_id, 'Not valid input')
+                self.telegram.send_message(last_chat_id, 'Not valid input.')
             else:
                 self.add_word(last_chat_id, parsed[0], parsed[1])
 
@@ -57,15 +57,25 @@ class LennyWoods:
 
     def check_translation(self, chat_id, translation):
         self.database.select('users', 'chat_id', chat_id)
+        if self.database.fetchone() == None:
+            self.telegram.send_message(chat_id, 'Write /start at first.')
+            return
+
+        self.database.select('users', 'chat_id', chat_id)
         user = User(self.database.fetchone())
         if translation == user.now_trans:
             self.telegram.send_message(chat_id, 'Correct!')
         else:
-            self.telegram.send_message(chat_id, 'You are wrong. The right word is "{}"'.format(user.now_trans))
+            self.telegram.send_message(chat_id, 'You are wrong. The right word is "{}".'.format(user.now_trans))
 
         self.create_task(chat_id)
 
     def add_word(self, chat_id, word, translation):
+        self.database.select('users', 'chat_id', chat_id)
+        if self.database.fetchone() == None:
+            self.telegram.send_message(chat_id, 'Write /start at first.')
+            return
+
         self.database.select('users', 'chat_id', chat_id)
         try:
             user = User(self.database.fetchone())
@@ -84,11 +94,12 @@ class LennyWoods:
             print(self.database.fetchone())
             self.telegram.send_message(chat_id, 'Word {} is added!'.format(word))
         except:
-            self.telegram.send_message(chat_id, 'Write /start at first. (:')
+            self.telegram.send_message(chat_id, 'Write /start at first.')
 
     def create_task(self, chat_id):
-        if len(eng_vocab) < 4:
-            self.telegram.send_message(chat_id, 'Add {} more words, please.'.format(4 - len(eng_vocab)))
+        self.database.select('users', 'chat_id', chat_id)
+        if self.database.fetchone() == None:
+            self.telegram.send_message(chat_id, 'Write /start at first.')
             return
 
         self.database.select('users', 'chat_id', chat_id)
@@ -96,6 +107,9 @@ class LennyWoods:
 
         eng_vocab = user.eng_vocab.split('|')
         ru_vocab = user.ru_vocab.split('|')
+        if len(eng_vocab) < 4:
+            self.telegram.send_message(chat_id, 'Add {} more words, please.'.format(4 - len(eng_vocab)))
+            return
 
         index = random.randint(0, len(eng_vocab) - 1)
         word = eng_vocab[index]
