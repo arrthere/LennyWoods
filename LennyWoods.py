@@ -87,15 +87,15 @@ class LennyWoods:
             self.telegram.send_message(chat_id, 'Write /start at first. (:')
 
     def create_task(self, chat_id):
+        if len(eng_vocab) < 4:
+            self.telegram.send_message(chat_id, 'Add {} more words, please.'.format(4 - len(eng_vocab)))
+            return
+
         self.database.select('users', 'chat_id', chat_id)
         user = User(self.database.fetchone())
 
         eng_vocab = user.eng_vocab.split('|')
         ru_vocab = user.ru_vocab.split('|')
-
-        if len(eng_vocab) < 4:
-            self.telegram.send_message(chat_id, 'Add {} more words, please.'.format(4 - len(eng_vocab)))
-            return
 
         index = random.randint(0, len(eng_vocab) - 1)
         word = eng_vocab[index]
